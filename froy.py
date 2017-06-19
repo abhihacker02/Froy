@@ -1,4 +1,4 @@
-impo11rt os
+import os
 import sys
 import ctypes
 import random
