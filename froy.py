@@ -1,4 +1,5 @@
 import os
+import time
 import sys
 import ctypes
 import random
@@ -16,9 +17,12 @@ videos=['Ed Sheeran - Shape of You [Official Video].mp4','Ellie Goulding - Burn.
         ,'Afreen Afreen, Rahat Fateh Ali Khan & Momina Mustehsan, Episode 2, Coke Studio Season 9.mp4'
         ,'bulleya.mp4','love me like u do.mp4','boulevards of broken dreams.mp4','numb.mp4','what makes u beautifull.mp4']
 speak = wincl.Dispatch("SAPI.SpVoice")
-while(leave==0):
+yt=0
+while(leave==0 and yt==0):
+    again=0
+    yt=0
     r = sr.Recognizer()
-    speak.Speak("sir,speak what should i do for you")
+    speak.Speak("sir,speak what should i do for you and If you want to leave just say Close the program")
     with sr.Microphone() as source:
 #for mic use sr.Microphone() as source and r.listen instead of r.record
 #print("Say something! I'll try to recognize it")   use sr.AudioFile("woman1_wb.wav") as source for reading audio file and r.record instead of r.listen
@@ -45,42 +49,52 @@ while(leave==0):
         try:
             webbrowser.open('http://www.'+link[1]+'.com')
         except:
-            print("sorry,no internet connection")
+            speak.Speak("sorry,no internet connection")
     elif(put.startswith('play')):
         try:
             link = '+'.join(link[1:])
-            say = link.replace('+', ' ')
+            voice = link.replace('+', ' ')
             url = 'https://www.youtube.com/results?search_query='+link
-            source_code = requests.get(url,timeout=50)
-            plain_text = source_code.text
-            soup = BeautifulSoup(plain_text, "html.parser")
-            songs = soup.findAll('div', {'class': 'yt-lockup-video'})
-            song = songs[0].contents[0].contents[0].contents[0]
-            hit = song['href']
-            speak.Speak("playing "+say)
-            webbrowser.open('https://www.youtube.com'+hit)
+            source = requests.get(url,timeout=50)
+            txt = source.text
+            soup = BeautifulSoup(txt, "html.parser")
+            allsongs = soup.findAll('div', {'class': 'yt-lockup-video'})
+            parsong = allsongs[0].contents[0].contents[0].contents[0]
+            toplay = parsong['href']
+            speak.Speak("playing "+voice)
+            webbrowser.open('https://www.youtube.com'+toplay)
+            yt=1
         except:
-            print('Sorry, No internet connection!')
-    elif put.startswith('empty '):
+            speak.Speak('Sorry, No internet connection!')
+    elif put.startswith('empty'):
         try:
             winshell.recycle_bin().empty(confirm=False,show_progress=False, sound=True)
-            print("Recycle Bin Empty!!")
+            speak.Speak("Sir the Recycle Bin is Empty!!")
+            print('recycle bin empty .You can check it')
         except:
             print("Unknown Error")
     elif put.startswith('lock'):
         try:
-            speak.Speak("locking the device")
+            speak.Speak("Sir i am Putting this device in sleep mode")
             ctypes.windll.user32.LockWorkStation()
         except Exception as e:
             print(str(e))
     elif put.endswith('bored'):
         try:
-            speak.Speak('''Sir, I\'m playing a dance video.Hope you like it''')
+            speak.Speak('''Sir, I\'m playing a music video since you're bored''')
             song = random.choice(videos)
             os.startfile(song)
+            quit
         except Exception as e:
             print(str(e))
-    elif(put.endswith('program')):
-         leave=1
-speak.Speak("closing the program")
+    elif('close' in link):
+        leave=1
+    elif('time' in link):
+        speak.Speak('sir the time is')
+        speak.Speak(time.strftime("%I:%M:%S"))
+    elif('date' in link):
+        speak.Speak('sir the date is')
+        speak.Speak(time.strftime("%x"))
+if(yt!=1):
+    speak.Speak("closing the program")
 quit
