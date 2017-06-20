@@ -51,7 +51,7 @@ while(leave==0):
             link = '+'.join(link[1:])
             say = link.replace('+', ' ')
             url = 'https://www.youtube.com/results?search_query='+link
-            source_code = requests.get(url, headers=headers,timeout=50)
+            source_code = requests.get(url,timeout=50)
             plain_text = source_code.text
             soup = BeautifulSoup(plain_text, "html.parser")
             songs = soup.findAll('div', {'class': 'yt-lockup-video'})
